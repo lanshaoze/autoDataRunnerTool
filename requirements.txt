@@ -1,0 +1,5 @@
+docxtpl==0.16.8
+py==1.11.0
+PyAutoGUI==0.9.54
+pytest==8.1.1
+pytest_html==4.1.1
