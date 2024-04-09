@@ -31,12 +31,14 @@ def deal_context(data,context):
         gameid = match_field(str(ed), 'gameid')
         channelid = match_field(str(ed), 'channelid')
         uid = match_field(str(ed), 'uid')
-        price = "{}{}".format(round(ed['payment']['price'] / 1000, 1), ed['payment']['currency']) if has_field(ed,'payment') else None
+        price = ed['payment']['price'] if has_field(ed,'payment') else None
+        currency = ed['payment']['currency'] if has_field(ed, 'payment') else None
         print('渠道：', channel)
         print('游戏id:', gameid)
         print('渠道id:', channelid)
         print('胡莱uid:', uid)
         print('支付金额:',price)
+        print('金额类型：',currency)
         # channel = match_field(str(ed), 'channel')
         channel_init = "success" if has_field(ed, 'channel_init_success') else RichText("fail", color='FF0000', size=28)
         login = "success" if has_field(ed, 'login') else RichText("fail", color='FF0000', size=28)
@@ -64,7 +66,8 @@ def deal_context(data,context):
             'gameid':gameid,
             'channelid':channelid,
             'uid':uid,
-            'price':price
+            'price':price,
+            'currency':currency
         }
 
         bi_table.append(bi_data)
