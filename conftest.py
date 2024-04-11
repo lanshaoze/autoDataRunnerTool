@@ -1,9 +1,9 @@
 # 一、修改测试报告标题
 from time import strftime
-import base64
-import io
-import pyautogui
-import pyautogui as pyautogui
+# import base64
+# import io
+# import pyautogui
+# import pyautogui as pyautogui
 import pytest
 from py._xmlgen import html
 
