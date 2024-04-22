@@ -5,17 +5,17 @@ import glob
 import generate_docx
 import pytest
 # from conftest import setup_channels
-# from test_run import get_logcat_data
 from Singleton import Singleton
 
 log_dir = 'logs'
 logs_data = {}
 final_result = {}
-tag_base = r'用户通用事件报送'
+# tag_base = r'用户通用事件报送'
+tag_base = 'standard_data'
 pattern = fr'{tag_base}.*channel_init_success|{tag_base}.*login|{tag_base}.*enter_server|{tag_base}.*payment'
 # print(pattern)
 tag_list = [tag_base]
-
+# tag_list = ["auto_runner_log"]
 
 def deal_original():
     for filename in glob.glob(os.path.join(log_dir, '*.txt')):
@@ -37,7 +37,7 @@ def parse_log(log):
     data = []
     for line in log.split('\n'):
         if any(tag in line for tag in tag_list):
-            # print(line)
+            print(line)
             # remove pattern
             data.append(line.strip())
             # if re.search(pattern,line):
@@ -48,6 +48,7 @@ def parse_log(log):
 
 
 def parse_result():
+    pattern = r'(\d+-\d+ \d+:\d+:\d+)'
     for key, data in logs_data.items():
         for value in data:
             # print(value)
@@ -58,6 +59,8 @@ def parse_result():
                 action = re.search(r'action:(\w+)', value).group(1)
             if 'values:' in value:
                 vlus = json.loads(re.search(r'values:(.+)', value).group(1))
+
+
             if action and vlus:
                 temp[action] = vlus
                 # channelid = re.search(r"'channelid':\s*'(\w+)'", str(temp)).group(1)
@@ -70,15 +73,16 @@ def parse_result():
                 if key not in final_result:
                     final_result[key] = {}
                 final_result[key][action] = vlus
+                # 读取时间
+                match = re.search(pattern, value)
+                if match:
+                    vlus["time"] = match.group(1)
 
-            # print('{}:{}'.format(action,vlus))
+            print('{}:{}'.format(action,vlus))
     # print('keys--->',final_result.keys())
     singleTon = Singleton()
     for key, value in final_result.items():
         singleTon.set(key, value)
-
-    # setup_channels(final_result.keys())
-
 
 def build_docx():
     generate_docx.build_docx(final_result)
@@ -93,7 +97,6 @@ dst_file = "docx/dest.txt"
 if __name__ == '__main__':
     deal_original()
     parse_result()
-    # get_logcat_data(final_result)
     build_docx()
     pytest.main([
         'test_run.py', '-v', '--html=./html/report.html',
@@ -102,7 +105,7 @@ if __name__ == '__main__':
 
     # if dst_file:
     #     os.truncate(dst_file,0)
-    # cmd = "grep -E {} {} > {}".format(tag_list,"logs/33810b6f(1).txt",dst_file)
+    # cmd = "grep -E {} {} > {}".format(tag_list,"logs/new_log.txt",dst_file)
     # os.system(cmd)
     # print(data['payment'])
     # print("payment:{}".format(data['payment']['pay_status']))

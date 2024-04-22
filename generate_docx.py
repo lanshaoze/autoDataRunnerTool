@@ -19,6 +19,7 @@ def deal_context(data,context):
     success_list = []
     fail_list = []
     bi_table = []
+    time_table = {}
     for key,ed in data.items():
         # print(f"Key: {key}, Value: {ed}")
         # for ed in value:
@@ -33,18 +34,28 @@ def deal_context(data,context):
         uid = match_field(str(ed), 'uid')
         price = ed['payment']['price'] if has_field(ed,'payment') else None
         currency = ed['payment']['currency'] if has_field(ed, 'payment') else None
+        orderid = ed['create_order']['orderId'] if has_field(ed, 'create_order') else None
+
+        for key, item in ed.items():
+            time = item['time'] if has_field(item, 'time') else ""
+            time_table[key] = time
+        # channel_init_time = ed['channel_init_success']['time'] if has_field(ed,'payment') else ""
+
+
         print('渠道：', channel)
         print('游戏id:', gameid)
         print('渠道id:', channelid)
         print('胡莱uid:', uid)
         print('支付金额:',price)
         print('金额类型：',currency)
+        print('订单Id:', orderid)
         # channel = match_field(str(ed), 'channel')
         channel_init = "success" if has_field(ed, 'channel_init_success') else RichText("fail", color='FF0000', size=28)
         login = "success" if has_field(ed, 'login') else RichText("fail", color='FF0000', size=28)
         enter_server = "success" if has_field(ed, 'enter_server') else RichText("fail", color='FF0000', size=28)
         payment = "success" if has_field(ed, 'payment') and ed['payment']['pay_status'] == 'success' else RichText(
             "fail", color='FF0000', size=28)
+
         result = '通过' if channel_init == 'success' and login == 'success' and enter_server == 'success' and payment == 'success' else RichText(
             "不通过", color='FF0000', size=28)
         temp = {
@@ -53,7 +64,11 @@ def deal_context(data,context):
             'login': login,
             'enter_server': enter_server,
             'payment': payment,
-            'result': result
+            'result': result,
+            'channel_init_time':time_table['channel_init_success'] if 'channel_init_success' in time_table else '',
+            'login_time': time_table['login'] if 'login' in time_table else '',
+            'enter_server_time': time_table['enter_server'] if 'enter_server' in time_table else '',
+            'payment_time': time_table['payment']if 'payment' in time_table else '',
         }
         content_list.append(temp)
         if result == '通过':
@@ -67,7 +82,8 @@ def deal_context(data,context):
             'channelid':channelid,
             'uid':uid,
             'price':price,
-            'currency':currency
+            'currency':currency,
+            'orderid':orderid
         }
 
         bi_table.append(bi_data)

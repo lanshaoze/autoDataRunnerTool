@@ -40,6 +40,7 @@ def test_channel(channel):
     print('胡莱uid:', match_field(str(ed), 'uid'))
     print('支付金额:',ed['payment']['price'] if has_field(ed,'payment') else None)
     print('金额类型:', ed['payment']['currency'] if has_field(ed, 'payment') else None)
+    print('订单Id:',ed['create_order']['orderId'] if has_field(ed, 'create_order') else None)
     print('=============BI相关==================')
     print('=============行为日志==================')
     print("行为日志：",ed)
