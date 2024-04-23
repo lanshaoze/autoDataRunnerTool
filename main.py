@@ -11,7 +11,7 @@ log_dir = 'logs'
 logs_data = {}
 final_result = {}
 # tag_base = r'用户通用事件报送'
-tag_base = 'standard_data'
+tag_base = 'auto_runner_log'
 pattern = fr'{tag_base}.*channel_init_success|{tag_base}.*login|{tag_base}.*enter_server|{tag_base}.*payment'
 # print(pattern)
 tag_list = [tag_base]
@@ -37,7 +37,7 @@ def parse_log(log):
     data = []
     for line in log.split('\n'):
         if any(tag in line for tag in tag_list):
-            print(line)
+            # print(line)
             # remove pattern
             data.append(line.strip())
             # if re.search(pattern,line):
@@ -68,7 +68,7 @@ def parse_result():
                 # gameid = re.search(r"'gameid':\s*'(\w+)'", str(temp)).group(1)
                 # # print("gameid:", gameid)
                 # key = channelid + '_' + gameid
-                key = re.search(r"'channel':\s*'(\w+)'", str(temp)).group(1)
+                key = re.search(r"'adChannel':\s*'(\w+)'", str(temp)).group(1)
                 # print(key)
                 if key not in final_result:
                     final_result[key] = {}

@@ -26,15 +26,23 @@ def deal_context(data,context):
         print('初始化:', "success" if has_field(ed, 'channel_init_success') else "fail")
         print('登录:', "success" if has_field(ed, 'login') else "fail")
         print('进服:', "success" if has_field(ed, 'enter_server') else "fail")
-        print('支付:', "success" if has_field(ed, 'payment') and ed['payment']['pay_status'] == 'success' else "fail")
 
-        channel = match_field(str(ed), 'channel')
-        gameid = match_field(str(ed), 'gameid')
-        channelid = match_field(str(ed), 'channelid')
+        #{"adChannel":"hoolai","balance":"0","baseEvent":false,"currency":"CNY","extendAction":"payment",
+        # "gameData":{"productId":"1","orderId":"AD7F3054BEEE40E7ADF25D2509C1EE1D","roleId":"1235761",
+        # "goodsId":"1","adChannel":"hoolai","gameInfo":"callbackInfo","serverName":"大唐战机","gps_adid":"",
+        # "payState":"success","serverId":"100","userId":"3000236226","package_belong":"12345678","uid":"3000236226",
+        # "payType":"weixin","price":"1","roleName":"昵称2","zoneId":"100","currency":"CNY","zoneName":"华东大区","roleLevel":"11",
+        # "udid":"SH5K3UG867C4ZPPE","goodsName":"钻石","channelId":"1"},"itemId":"1","itemName":"钻石","orderId":"AD7F3054BEEE40E7ADF25D2509C1EE1D",
+        # "partName":"无帮派","price":"1","result":true,"roleId":"0","roleLevel":"1","roleName":"无","serverId":"0","serverName":"国服","userId":"3000236226","vip":"1","zoneId":"0","zoneName":"1区"}
+        print('支付:', "success" if has_field(ed, 'payment') and ed['payment']['result'] else "fail")
+
+        channel = match_field(str(ed), 'adChannel')
+        gameid = match_field(str(ed), 'productId')
+        channelid = match_field(str(ed), 'channelId')
         uid = match_field(str(ed), 'uid')
-        price = ed['payment']['price'] if has_field(ed,'payment') else None
-        currency = ed['payment']['currency'] if has_field(ed, 'payment') else None
-        orderid = ed['create_order']['orderId'] if has_field(ed, 'create_order') else None
+        price = ed['payment']['gameData']['price'] if has_field(ed,'payment') else None
+        currency = ed['payment']['gameData']['currency'] if has_field(ed, 'payment') else None
+        orderid = ed['payment']['gameData']['orderId'] if has_field(ed, 'payment') else None
 
         for key, item in ed.items():
             time = item['time'] if has_field(item, 'time') else ""
@@ -53,7 +61,7 @@ def deal_context(data,context):
         channel_init = "success" if has_field(ed, 'channel_init_success') else RichText("fail", color='FF0000', size=28)
         login = "success" if has_field(ed, 'login') else RichText("fail", color='FF0000', size=28)
         enter_server = "success" if has_field(ed, 'enter_server') else RichText("fail", color='FF0000', size=28)
-        payment = "success" if has_field(ed, 'payment') and ed['payment']['pay_status'] == 'success' else RichText(
+        payment = "success" if has_field(ed, 'payment') and ed['payment']['result'] else RichText(
             "fail", color='FF0000', size=28)
 
         result = '通过' if channel_init == 'success' and login == 'success' and enter_server == 'success' and payment == 'success' else RichText(

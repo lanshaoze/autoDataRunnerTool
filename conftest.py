@@ -10,13 +10,13 @@ from py._xmlgen import html
 from pytest_html import extras
 
 from Singleton import Singleton
-# @pytest.mark.optionalhook
-# def pytest_metadata(metadata):
-#     metadata.pop("Python", None)
-#     metadata.pop("Platform", None)
-#     metadata.pop("Packages", None)
-#     metadata.pop("Plugins", None)
-#     metadata.pop("JAVA_HOME", None)
+@pytest.mark.optionalhook
+def pytest_metadata(metadata):
+    metadata.pop("Python", None)
+    metadata.pop("Platform", None)
+    metadata.pop("Packages", None)
+    metadata.pop("Plugins", None)
+    metadata.pop("JAVA_HOME", None)
 
 @pytest.hookimpl(optionalhook=True)
 def pytest_html_report_title(report):

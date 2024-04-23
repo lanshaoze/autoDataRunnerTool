@@ -28,19 +28,19 @@ def test_channel(channel):
     enter_server = "success" if has_field(ed, 'enter_server') else "fail"
     print('进服:', enter_server)
     print(f'\n开始测试渠道:{channel}的支付功能')
-    payment = "success" if has_field(ed, 'payment') and ed['payment']['pay_status'] == 'success' else "fail"
+    payment = "success" if has_field(ed, 'payment') and ed['payment']['result'] else "fail"
     print('支付:', payment)
     result = '通过' if channel_init == 'success' and login == 'success' and enter_server == 'success' and payment == 'success' else "不通过"
     print(f"\n测试结果:",result)
     print('=============BI相关==================')
-    print('支付:', "success" if has_field(ed, 'payment') and ed['payment']['pay_status'] == 'success' else "fail")
-    print('渠道：', match_field(str(ed), 'channel'))
-    print('游戏id:', match_field(str(ed), 'gameid'))
-    print('渠道id:', match_field(str(ed), 'channelid'))
+    print('支付:', "success" if has_field(ed, 'payment') and ed['payment']['result'] else "fail")
+    print('渠道：', match_field(str(ed), 'adChannel'))
+    print('游戏id:', match_field(str(ed), 'productId'))
+    print('渠道id:', match_field(str(ed), 'channelId'))
     print('胡莱uid:', match_field(str(ed), 'uid'))
-    print('支付金额:',ed['payment']['price'] if has_field(ed,'payment') else None)
-    print('金额类型:', ed['payment']['currency'] if has_field(ed, 'payment') else None)
-    print('订单Id:',ed['create_order']['orderId'] if has_field(ed, 'create_order') else None)
+    print('支付金额:',ed['payment']['gameData']['price'] if has_field(ed,'payment') else None)
+    print('金额类型:', ed['payment']['gameData']['currency'] if has_field(ed, 'payment') else None)
+    print('订单Id:',ed['payment']['gameData']['orderId'] if has_field(ed, 'payment') else None)
     print('=============BI相关==================')
     print('=============行为日志==================')
     print("行为日志：",ed)
