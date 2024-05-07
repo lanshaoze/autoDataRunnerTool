@@ -8,11 +8,11 @@ def build_docx(data):
     context = {}
     context = deal_context(data,context)
     tpl.render(context)
-    tpl.save('docx/{}测试报告.docx'.format(get_current_time()))
+    tpl.save('docx/{}.docx'.format(get_current_time()))
 
 
 def get_current_time():
-    return datetime.now().strftime("%Y-%m-%d")
+    return datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
 def deal_context(data,context):
     content_list = []

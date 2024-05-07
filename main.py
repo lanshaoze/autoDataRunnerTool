@@ -3,6 +3,7 @@ import re
 import os
 import glob
 import generate_docx
+from datetime import datetime
 import pytest
 # from conftest import setup_channels
 from Singleton import Singleton
@@ -99,7 +100,7 @@ if __name__ == '__main__':
     parse_result()
     build_docx()
     pytest.main([
-        'test_run.py', '-v', '--html=./html/report.html',
+        'test_run.py', '-v', '--html=./html/{}.html'.format(datetime.now().strftime("%Y-%m-%d %H:%M:%S")),
         '--self-contained-html'
     ])
 
