@@ -2,6 +2,9 @@ from docxtpl import DocxTemplate, RichText
 from datetime import datetime
 import re
 import test_run
+from Singleton import Singleton
+
+
 def build_docx(data):
     docx_path = 'docx/temple.docx'
     tpl = DocxTemplate(docx_path)
@@ -20,6 +23,7 @@ def deal_context(data,context):
     fail_list = []
     bi_table = []
     time_table = {}
+    new_bi_datas = []
     for key,ed in data.items():
         # print(f"Key: {key}, Value: {ed}")
         # for ed in value:
@@ -94,8 +98,10 @@ def deal_context(data,context):
             'orderid':orderid
         }
 
+        new_bi_data = [channel,gameid,channelid,uid,price,currency,orderid]
+        new_bi_datas.append(new_bi_data)
         bi_table.append(bi_data)
-
+    Singleton().setBiData(new_bi_datas)
     result = {
         'total_count':len(data),
         'success_count':len(success_list),

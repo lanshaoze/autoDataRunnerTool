@@ -98,7 +98,7 @@ dst_file = "docx/dest.txt"
 if __name__ == '__main__':
     deal_original()
     parse_result()
-    build_docx()
+    # build_docx()
     pytest.main([
         'test_run.py', '-v', '--html=./html/{}.html'.format(datetime.now().strftime("%Y-%m-%d %H:%M:%S")),
         '--self-contained-html'

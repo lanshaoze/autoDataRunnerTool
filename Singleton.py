@@ -3,6 +3,7 @@
 import threading
 class Singleton(object):
     _instance_lock = threading.Lock()
+    bi_data = []
     config = {}
     def __init__(self):
         pass
@@ -21,3 +22,12 @@ class Singleton(object):
 
     def getConfig(self):
         return self.config
+
+    def setBiData(self,data):
+        self.bi_data = data
+
+    def getBiData(self):
+        return self.bi_data
+
+    def clearBiData(self):
+        self.bi_data.clear()
