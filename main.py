@@ -100,7 +100,7 @@ if __name__ == '__main__':
     parse_result()
     # build_docx()
     pytest.main([
-        'test_run.py', '-v', '--html=./html/{}.html'.format(datetime.now().strftime("%Y-%m-%d %H:%M:%S")),
+        'test_run.py', '-v', '--html=./html/{}.html'.format(datetime.now().strftime("%Y-%m-%d %H_%M_%S")),
         '--self-contained-html'
     ])
 
