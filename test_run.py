@@ -7,7 +7,9 @@ from docxtpl import RichText
 from pytest_html import extras
 
 from Singleton import Singleton
-from conftest import get_channel,getData
+from conftest import get_channel, getData
+
+
 # if __name__ == '__main__':
 #     pytest.main([
 #         'test_run.py', '-v', '--html=./directory/report.html',
@@ -18,10 +20,25 @@ def getDataByChannel(channel):
     result = getData()
     return result[channel]
 
+
 @pytest.mark.parametrize('channel', get_channel())
 def test_channel(channel):
     result = deal_result(channel)
     assert True if result == '通过' else False
+
+
+pattern_init = fr'.*channel_init*'
+pattern_login = fr'.*login|.*auth*'
+pattern_pay = fr'.*pay*'
+
+
+def find_pattern_fields(pattern, obj):
+    if isinstance(obj, dict):
+        for key, value in obj.items():
+            # print(f"key:{key} -- value:{value}")
+            if re.search(pattern, key, re.IGNORECASE):
+                yield key, value
+
 
 def deal_result(channel):
     # '''执行初始化测试'''
@@ -30,7 +47,7 @@ def deal_result(channel):
     channel_init = "success" if has_field(ed, 'channel_init_success') else "fail"
     # print('初始化:', channel_init)
     # print(f'\n开始测试渠道:{channel}的登录功能')
-    login = "success" if has_field(ed, 'login') else "fail"
+    login = "success" if has_field(ed, 'login_game') else "fail"
     # print('登录:', login)
     # print(f'\n开始测试渠道:{channel}的进服功能')
     enter_server = "success" if has_field(ed, 'enter_server') else "fail"
@@ -45,24 +62,23 @@ def deal_result(channel):
         time = item['time'] if has_field(item, 'time') else ""
         time_table[key] = time
 
-    channel_init_time = "({})".format(time_table['channel_init_success']) if 'channel_init_success' in time_table else ''
+    channel_init_time = "({})".format(
+        time_table['channel_init_success']) if 'channel_init_success' in time_table else ''
     login_time = "({})".format(time_table['login']) if 'login' in time_table else ''
     enter_server_time = "({})".format(time_table['enter_server']) if 'enter_server' in time_table else ''
-    payment_time = "({})".format(time_table['payment'])if 'payment' in time_table else ''
+    payment_time = "({})".format(time_table['payment']) if 'payment' in time_table else ''
     # 准备数据
     data = [
-        ["渠道", "初始化", "登录","进服","支付","结果"],
-        [channel, "{}{}".format(channel_init,channel_init_time), "{}{}".format(login,login_time), "{}{}".format(enter_server,enter_server_time), "{}{}".format(payment,payment_time), result],
+        ["渠道", "初始化", "登录", "进服", "支付", "结果"],
+        [channel, "{}{}".format(channel_init, channel_init_time), "{}{}".format(login, login_time),
+         "{}{}".format(enter_server, enter_server_time), "{}{}".format(payment, payment_time), result],
     ]
 
     # 使用tabulate打印表格
-    table = tabulate.tabulate(data, headers="firstrow", tablefmt="grid",numalign="center", stralign="center")
+    table = tabulate.tabulate(data, headers="firstrow", tablefmt="grid", numalign="center", stralign="center")
     print(table)
 
-    print('\n\n\n\n=============行为日志==================')
-    print("行为日志：",ed)
-
-    #获取BI相关信息封装
+    # 获取BI相关信息封装
     channel = match_field(str(ed), 'adChannel')
     gameid = match_field(str(ed), 'productId')
     channelid = match_field(str(ed), 'channelId')
@@ -70,8 +86,46 @@ def deal_result(channel):
     price = ed['payment']['gameData']['price'] if has_field(ed, 'payment') else None
     currency = ed['payment']['gameData']['currency'] if has_field(ed, 'payment') else None
     orderid = ed['payment']['gameData']['orderId'] if has_field(ed, 'payment') else None
-    new_bi_data = [channel,gameid,channelid,uid,price,currency,orderid]
+    new_bi_data = [channel, gameid, channelid, uid, price, currency, orderid]
     Singleton().getBiData().append(new_bi_data)
+
+    if result == '不通过':
+        print('\n\n=============错误流程==================')
+        # print(ed)
+        # logs = {}
+        process_path = []
+
+        # print("行为日志：",ed)
+        # find_pattern_fields("login", ed)
+
+        if channel_init != "success":
+            # logs.clear()
+            process_path.clear()
+            for key, value in find_pattern_fields(pattern_init, ed):
+                # logs[key] = value
+                process_path.append(key)
+
+            # print("登录日志：",logs)
+            print("初始化流程：", process_path)
+
+        if login != "success":
+            # logs.clear()
+            process_path.clear()
+            for key, value in find_pattern_fields(pattern_login, ed):
+                # logs[key] = value
+                process_path.append(key)
+
+            # print("登录日志：",logs)
+            print("登录流程：", process_path)
+
+        if payment != "success":
+            process_path.clear()
+            for key, value in find_pattern_fields(pattern_pay, ed):
+                # logs[key] = value
+                process_path.append(key)
+
+            # print("支付日志：", logs)
+            print("支付流程：", process_path)
     return result
 
 
@@ -146,15 +200,16 @@ def deal_result(channel):
 #     extras.channel = channel
 
 
-def has_field(json_obj,field):
+def has_field(json_obj, field):
     return field in json_obj
 
-def match_field(json_obj,field):
+
+def match_field(json_obj, field):
     pattern2 = r"'%s':\s*'(\w+)'" % field
     # print("pattern:",pattern2)
     if field in json_obj:
         # pattern = r'channel:(\w+)'
-        match = re.search(pattern2,json_obj)
+        match = re.search(pattern2, json_obj)
         if match:
             return match.group(1)
         else:

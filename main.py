@@ -13,7 +13,7 @@ logs_data = {}
 final_result = {}
 # tag_base = r'用户通用事件报送'
 tag_base = 'auto_runner_log'
-pattern = fr'{tag_base}.*channel_init_success|{tag_base}.*login|{tag_base}.*enter_server|{tag_base}.*payment'
+pattern = fr'{tag_base}.*channel_init_success*|{tag_base}.*login|{tag_base}.*enter_server|{tag_base}.*payment'
 # print(pattern)
 tag_list = [tag_base]
 # tag_list = ["auto_runner_log"]
