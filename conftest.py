@@ -7,12 +7,20 @@ import tabulate
 # import pyautogui as pyautogui
 import pytest
 from py._xmlgen import html
+import plotly.graph_objs as go
 
 from pytest_html import extras
 
 from Singleton import Singleton
 
-
+# 存储测试结果数据
+test_results = {
+    'total': 0,
+    'passed': 0,
+    'failed': 0,
+    'skipped': 0,
+    'error': 0
+}
 @pytest.mark.optionalhook
 def pytest_metadata(metadata):
     metadata.pop("Python", None)
@@ -27,13 +35,39 @@ def pytest_html_report_title(report):
     report.title = "自动化测试报告"
 
 
+
+
 # 二、修改Summary部分的信息
 @pytest.mark.parametrize
 def pytest_html_results_summary(prefix, summary, postfix):
     prefix.extend([html.p("所属部门：平台支持中心")])
     prefix.extend([html.p("技术人员：芦杰")])
     prefix.extend([html.p("报告生成时间：{}".format(strftime("%Y-%m-%d %H:%M:%S")))])
+
+    prefix.extend([html.h2("通过率占比")])
+    # 准备数据
+    labels = ['Passed', 'Failed', 'Skipped', 'Error']
+    values = [test_results['passed'], test_results['failed'], test_results['skipped'], test_results['error']]
+
+    # print("valuees==>{}".format(values))
+
+    # colors = ['green', 'red', '#99FF99','#FF9999']    ,marker=dict(colors=colors)
+
+    # 创建饼图
+    fig = go.Figure(data=[go.Pie(labels=labels, values=values)])
+
+    # 设置布局
+    fig.update_layout(
+        title='',
+        width=500,
+        height=400
+    )
+    # 将图形转换为HTML
+    html_str = fig.to_html(full_html=False, include_plotlyjs='cdn')
+    prefix.extend([html_str])
+
     prefix.extend([html.h2("BI相关信息")])
+
     # 准备数据
     # data = [
     #     ["channel", "gameid", "channelid","uid","price","currency","orderid"],
@@ -55,8 +89,12 @@ def pytest_html_results_summary(prefix, summary, postfix):
     table_html = tabulate.tabulate(data, headers="firstrow", tablefmt="html", numalign="center", stralign="center")
     prefix.extend([table_html])
 
-    prefix.extend([html.h2("测试结果")])
+    # prefix.extend([html.h2("测试结果")])
     Singleton().clearBiData()
+
+    prefix.extend([html.h2("渠道详细信息")])
+
+
 
 
 # @pytest.mark.optionalhook
@@ -69,6 +107,9 @@ def pytest_html_results_table_header(cells):
     # cells.insert(2, html.th('Description'))
     cells.insert(2, html.th('TaskCompleteTime'))
     cells.pop(-1)
+@pytest.mark.optionalhook
+def pytest_sessionfinish(session, exitstatus):
+    print("进入了pytest_sessionfinish")
 
 
 def pytest_html_results_table_row(report, cells):
@@ -76,27 +117,24 @@ def pytest_html_results_table_row(report, cells):
     # cells.insert(2, html.td(report.Description))
     cells.insert(2, html.td(report.TaskCompleteTime))
     cells.pop(-1)
-
+    if report.when == 'call':
+        test_results['total'] += 1
+        if report.passed:
+            test_results['passed'] += 1
+        elif report.failed:
+            test_results['failed'] += 1
+        elif report.skipped:
+            test_results['skipped'] += 1
+        elif report.outcome == 'error':
+            test_results['error'] += 1
+        print("====total:{} passed:{} skipped:{}  error:{}".format(test_results['passed'], test_results['failed'], test_results['skipped'], test_results['error']))
 
 channels = Singleton().getConfig().keys()
 
-# # 准备要添加到HTML报告中的数据
-# data1 = [
-#     ["Name", "Age", "City"],
-#     ["Alice", 25, "New York"],
-#     ["Bob", 30, "London"],
-#     ["Charlie", 35, "Paris"]
-# ]
-#
-# # 将数据格式化为HTML表格
-# table_html = tabulate.tabulate(data1, headers="firstrow", tablefmt="html", numalign="center", stralign="center")
-#
-#
-# # 自定义HTML报告
+# 自定义HTML报告
 # @pytest.mark.optionalhook
 # def pytest_html_results_table_html(report, data):
-#     # 在报告底部添加额外的HTML表格
-#     data.append(f"<h2>检测结果</h2>{table_html}")
+#     # 获取测试结果数据
 
 def get_channel():
     # 这里可以动态获取渠道

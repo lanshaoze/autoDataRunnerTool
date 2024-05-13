@@ -89,6 +89,14 @@ def deal_result(channel):
     new_bi_data = [channel, gameid, channelid, uid, price, currency, orderid]
     Singleton().getBiData().append(new_bi_data)
 
+    process_all = []
+    for key, value in ed.items():
+        process_all.append(key)
+
+    print('\n\n=============日志执行流程==================')
+    print('\n')
+    print(process_all)
+
     if result == '不通过':
         print('\n\n=============错误流程==================')
         # print(ed)
@@ -98,34 +106,52 @@ def deal_result(channel):
         # print("行为日志：",ed)
         # find_pattern_fields("login", ed)
 
-        if channel_init != "success":
+
+
+
+        if channel_init != 'success':
             # logs.clear()
             process_path.clear()
+            channel_logs = {}
             for key, value in find_pattern_fields(pattern_init, ed):
                 # logs[key] = value
                 process_path.append(key)
+                channel_logs[key] = value
+
 
             # print("登录日志：",logs)
-            print("初始化流程：", process_path)
+            print("\n\n初始化流程：", process_path)
+            print("\n")
+            print(channel_logs)
 
         if login != "success":
             # logs.clear()
             process_path.clear()
+            login_logs = {}
             for key, value in find_pattern_fields(pattern_login, ed):
                 # logs[key] = value
                 process_path.append(key)
+                login_logs[key] = value
 
             # print("登录日志：",logs)
-            print("登录流程：", process_path)
+            print("\n\n登录流程：", process_path)
+            print("\n")
+            print(login_logs)
 
         if payment != "success":
             process_path.clear()
+            payment_logs = {}
             for key, value in find_pattern_fields(pattern_pay, ed):
                 # logs[key] = value
                 process_path.append(key)
+                payment_logs[key] = value
 
             # print("支付日志：", logs)
-            print("支付流程：", process_path)
+            print("\n\n支付流程：", process_path)
+            print("\n")
+            print(payment_logs)
+    # print('\n\n\n\n=============完整日志==================')
+    # print(ed)
     return result
 
 
