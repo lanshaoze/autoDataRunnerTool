@@ -51,10 +51,10 @@ def pytest_html_results_summary(prefix, summary, postfix):
 
     # print("valuees==>{}".format(values))
 
-    # colors = ['green', 'red', '#99FF99','#FF9999']    ,marker=dict(colors=colors)
+    colors = ['#19C584', 'red', '#5152F9','#9944F9']
 
     # 创建饼图
-    fig = go.Figure(data=[go.Pie(labels=labels, values=values)])
+    fig = go.Figure(data=[go.Pie(labels=labels, values=values,marker=dict(colors=colors))])
 
     # 设置布局
     fig.update_layout(
@@ -87,15 +87,28 @@ def pytest_html_results_summary(prefix, summary, postfix):
 
     # 使用tabulate打印居中对齐的表格
     table_html = tabulate.tabulate(data, headers="firstrow", tablefmt="html", numalign="center", stralign="center")
-    prefix.extend([table_html])
+
+    # 构建完整的HTML
+    final_html = "<html>\n<head>\n<title>Table Example</title>\n"
+    final_html += "<style>\n"
+    final_html += "table {\n"
+    final_html += "  border-collapse: collapse;\n"
+    final_html += "}\n"
+    final_html += "th, td {\n"
+    final_html += "  border: 1px solid #e5e5e5;\n"
+    final_html += "  padding: 5px;\n"
+    final_html += "}\n"
+    final_html += "</style>\n"
+    final_html += "</head>\n<body>\n"
+    final_html += table_html
+    final_html += "\n</body>\n</html>"
+    print(final_html)
+    prefix.extend([final_html])
 
     # prefix.extend([html.h2("测试结果")])
     Singleton().clearBiData()
 
     prefix.extend([html.h2("渠道详细信息")])
-
-
-
 
 # @pytest.mark.optionalhook
 # def pytest_html_results_summary(prefix, summary, postfix):
