@@ -82,11 +82,14 @@ def pytest_html_results_summary(prefix, summary, postfix):
     #     ["4399", 3007, 10138, "3000476824", 100, "CNY", "6042FD14062A4C1B9B78D17C8BFB570B"],
     #     ["4399", 3007, 10138, "3000476824", 100, "CNY", "6042FD14062A4C1B9B78D17C8BFB570B"],
     # ]
+    final_data = []
+    final_data.append(["channel", "gameid  ", "  channelid  ","  uid  ","price","currency","  orderid  "])
     data = Singleton().getBiData()
-    data[0] = ["channel", "gameid  ", "  channelid  ","  uid  ","price","currency","  orderid  "]
+    for value in data:
+        final_data.append(value)
 
     # 使用tabulate打印居中对齐的表格
-    table_html = tabulate.tabulate(data, headers="firstrow", tablefmt="html", numalign="center", stralign="center")
+    table_html = tabulate.tabulate(final_data, headers="firstrow", tablefmt="html", numalign="center", stralign="center")
 
     # 构建完整的HTML
     final_html = "<html>\n<head>\n<title>Table Example</title>\n"
